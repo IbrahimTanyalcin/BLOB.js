@@ -59,7 +59,7 @@ var coordinates = [0,0];
 				}
 				var distanceRlastR1=Math.sqrt(Math.pow(a[a.length-1],2)+Math.pow(a[1],2)-2*a[a.length-1]*a[1]*Math.cos(residualAngle+a[0]/360*Math.PI*2));
 				var zeta = Math.asin(a[a.length-1]*Math.sin(residualAngle+a[0]/360*Math.PI*2)/distanceRlastR1);
-				var r0 = residualAngle!==0?Math.sin(zeta)*a[1]/Math.sin(Math.PI-zeta-a[0]/360*Math.PI*2):a[a.length-1];
+				var r0 = Math.round(residualAngle*1000000)/1000000!==0?Math.sin(zeta)*a[1]/Math.sin(Math.PI-zeta-a[0]/360*Math.PI*2):a[a.length-1];
 				var angle = i/nodeCount*360;
 				for (var j = 0,sum =0;(i/nodeCount*360>a[j]+sum && j<a.length);j+=2){
 					sum += a[j];
@@ -153,6 +153,8 @@ var coordinates = [0,0];
 			var tickRadius = blobObject.tickRadius || 3;
 			var harmonicRadius = blobObject.harmonicRadius || 0.25*blobRadius;
 			var startTime;
+			var frameRate = blobObject.frameRate===undefined?1000:blobObject.frameRate;
+			var frameCount = 0;
 			var sync = blobObject.sync || 1;
 			var randomness = blobObject.randomness || 0;
 			var blobRadii = [];
@@ -174,6 +176,9 @@ var coordinates = [0,0];
 			var parameterTime = blobObject.parameterTime || function(){return 1;};
 			var offset = blobObject.offset===undefined? [0,0] : blobObject.offset;
 			var isStatic = blobObject.isStatic ? blobObject.isStatic : 0;
+			var phase = blobObject.phase ? blobObject.phase : 0;
+			var tick = blobObject.tick===undefined ? 1 : blobObject.tick; 
+			var tickLine = blobObject.tickLine===undefined ? 1 : blobObject.tickLine; 
 			//globals
 			
 			//append the canvas element
@@ -201,7 +206,6 @@ var coordinates = [0,0];
 			
 			function animate(timestamp) {
 				var thetaMouse = Math.atan((origin[1]+offset[1]-coordinates[1])/(origin[0]+offset[0]-coordinates[0]));
-				context.clearRect(0,0,width,height);
 				context.globalAlpha = xray;
 				var bounceCoeff = 1;
 				if (bounce !== 0 && !(Math.round(bounceStrength*1000)/1000 === 0)) {
@@ -221,44 +225,81 @@ var coordinates = [0,0];
 					}
 				}
 				var currentTime = (timestamp-startTime)/1000;
-				for (i=0;i<nodeCount;i++) {
-					var theta = thetas[i];
-					var sign = Math.sign(origin[0]+offset[0]-coordinates[0])*Math.sign(origin[0]-circlePositions[i][0]);
-					if (i === 0 || i === nodeCount/2) {
-						sign = -Math.sign(origin[0]+offset[0]-coordinates[0]);
+			
+				if(currentTime*frameRate-frameCount>1 || currentTime===0){	
+					context.clearRect(0,0,width,height);
+					for (i=0;i<nodeCount;i++) {
+						var theta = thetas[i];
+						var sign = Math.sign(origin[0]+offset[0]-coordinates[0])*Math.sign(origin[0]-circlePositions[i][0]);
+						if (i === 0 || i === nodeCount/2) {
+							sign = -Math.sign(origin[0]+offset[0]-coordinates[0]);
+						}
+						var distance = Math.min(Math.sqrt(Math.pow(coordinates[0]-origin[0]-offset[0],2)+Math.pow(coordinates[1]-origin[1]-offset[1],2)),blobRadius)/blobRadius;
+						var thetaDiff = thetaMouse-theta;
+						circlePositions[i]=[origin[0]+parameterTime(i,nodeCount,currentTime)*(blobRadii[i]+attraction*blobRadii[i]*bounceCoeff*sign*distance*Math.cos(thetaDiff))*Math.sin(i*Math.PI*2/nodeCount),origin[1]-parameterTime(i,nodeCount,currentTime)*(blobRadii[i]+attraction*blobRadii[i]*bounceCoeff*sign*distance*Math.cos(thetaDiff))*Math.cos(i*Math.PI*2/nodeCount)];
+						orCirclePositions[i]=[origin[0]+parameterTime(i,nodeCount,currentTime)*(blobRadii[i]+attraction*blobRadii[i]*bounceCoeff*sign*distance*Math.cos(thetaDiff))*Math.sin(i*Math.PI*2/nodeCount),origin[1]-parameterTime(i,nodeCount,currentTime)*(blobRadii[i]+attraction*blobRadii[i]*bounceCoeff*sign*distance*Math.cos(thetaDiff))*Math.cos(i*Math.PI*2/nodeCount)];
+						circleHarmonicLimits[i] = calculateMotionSpan(i);
 					}
-					var distance = Math.min(Math.sqrt(Math.pow(coordinates[0]-origin[0]-offset[0],2)+Math.pow(coordinates[1]-origin[1]-offset[1],2)),blobRadius)/blobRadius;
-					var thetaDiff = thetaMouse-theta;
-					circlePositions[i]=[origin[0]+parameterTime(i,nodeCount,currentTime)*(blobRadii[i]+attraction*blobRadii[i]*bounceCoeff*sign*distance*Math.cos(thetaDiff))*Math.sin(i*Math.PI*2/nodeCount),origin[1]-parameterTime(i,nodeCount,currentTime)*(blobRadii[i]+attraction*blobRadii[i]*bounceCoeff*sign*distance*Math.cos(thetaDiff))*Math.cos(i*Math.PI*2/nodeCount)];
-					orCirclePositions[i]=[origin[0]+parameterTime(i,nodeCount,currentTime)*(blobRadii[i]+attraction*blobRadii[i]*bounceCoeff*sign*distance*Math.cos(thetaDiff))*Math.sin(i*Math.PI*2/nodeCount),origin[1]-parameterTime(i,nodeCount,currentTime)*(blobRadii[i]+attraction*blobRadii[i]*bounceCoeff*sign*distance*Math.cos(thetaDiff))*Math.cos(i*Math.PI*2/nodeCount)];
-					circleHarmonicLimits[i] = calculateMotionSpan(i);
-				}
-				for (i=0;i<nodeCount;i++){
-					var w = 2*Math.PI/circlePeriods[i];
-					var theta = thetas[i];
-					var sign = sync === 1? Math.sign(nodeCount/2-i) || 1 : 1;
-					var x = orCirclePositions[i][0]+1*(harmonicRadius*Math.sin(w*currentTime)*Math.cos(theta)*sign);
-					var y = orCirclePositions[i][1]+1*(harmonicRadius*Math.sin(w*currentTime)*Math.sin(theta)*sign);
-					circlePositions[i] = [x,y];
-					circleHarmonicLimits[i] = calculateMotionSpan(i);
+					for (i=0;i<nodeCount;i++){
+						var w = 2*Math.PI/circlePeriods[i];
+						var theta = thetas[i];
+						var sign = sync === 1? Math.sign(nodeCount/2-i) || 1 : 1;
+						var x = orCirclePositions[i][0]+1*(harmonicRadius*Math.sin(w*currentTime+phase)*Math.cos(theta)*sign);
+						var y = orCirclePositions[i][1]+1*(harmonicRadius*Math.sin(w*currentTime+phase)*Math.sin(theta)*sign);
+						circlePositions[i] = [x,y];
+						circleHarmonicLimits[i] = calculateMotionSpan(i);
+						context.globalAlpha = xray;
+						context.beginPath();
+						context.arc(x,y,1,0,2*Math.PI,false);
+						context.lineWidth = 2;
+						context.strokeStyle = "Black";
+						context.stroke();
+						context.fillStyle = "Black";
+						context.fill();
+						generateTick(i);
+					}
+					for (i=0;i<nodeCount;i++){
+						context.globalAlpha = tickLine;
+						context.beginPath();
+						context.moveTo(origin[0],origin[1]);
+						context.lineTo(circlePositions[i][0],circlePositions[i][1]);
+						context.lineWidth = 1;
+						context.strokeStyle = "Black";
+						context.stroke();
+					}
 					context.beginPath();
-					context.arc(x,y,1,0,2*Math.PI,false);
-					context.lineWidth = 2;
-					context.strokeStyle = "Black";
+					context.moveTo(circlePositions[0][0],circlePositions[0][1]);
+					context.lineJoin="round";
+					context.lineWidth = lineWidth;
+					context.strokeStyle = strokeStyle;
+					context.fillStyle = fillStyle;
+					context.globalAlpha = lineOpacity;
+					for (i=1;i<nodeCount;i++){
+						context.lineTo(circlePositions[i][0],circlePositions[i][1]);
+					}
+					context.closePath();
 					context.stroke();
-					context.fillStyle = "Black";
+					context.globalAlpha = fillOpacity;
 					context.fill();
-					generateTick(i);
+					
+					//next frame
+					frameCount++;
 				}
-				for (i=0;i<nodeCount;i++){
-					context.beginPath();
-					context.moveTo(origin[0],origin[1]);
-					context.lineTo(circlePositions[i][0],circlePositions[i][1]);
-					context.lineWidth = 1;
-					context.strokeStyle = "Black";
-					context.stroke();
+				if (bounce !== 0 && (Math.round(bounceStrength*1000)/1000 === 0)) {
+					bounce = bounce-1;
+					bounceStrength = Math.PI*4;
+				} else if (bounce === 0 && (Math.round(bounceStrength*1000)/1000 === 0)){
+					bounceStrength = Math.PI*4;
 				}
+				var distance = Math.sqrt(Math.pow(coordinates[0]-origin[0]-offset[0],2)+Math.pow(coordinates[1]-origin[1]-offset[1],2));
+				var thresholdRadius = (Math.max.apply(null,blobRadii)+Math.min.apply(null,blobRadii))/2;
+				if (Math.round((thresholdRadius+attraction*thresholdRadius+lineWidth/2)/distance*10)/10 === 1 && bounceOn === 1) {
+					bounce = 1;
+					bounceStrength = Math.PI*4;
+				}
+				
 				function generateTick(order){
+					context.globalAlpha = tick;
 					context.beginPath();
 					context.moveTo(orCirclePositions[order][0]+harmonicRadius*Math.sin(order*Math.PI*2/nodeCount)-tickRadius*Math.cos(order*Math.PI*2/nodeCount),orCirclePositions[order][1]-harmonicRadius*Math.cos(order*Math.PI*2/nodeCount)-tickRadius*Math.sin(order*Math.PI*2/nodeCount));
 					context.lineTo(orCirclePositions[order][0]+harmonicRadius*Math.sin(order*Math.PI*2/nodeCount)+tickRadius*Math.cos(order*Math.PI*2/nodeCount),orCirclePositions[order][1]-harmonicRadius*Math.cos(order*Math.PI*2/nodeCount)+tickRadius*Math.sin(order*Math.PI*2/nodeCount));
@@ -280,36 +321,6 @@ var coordinates = [0,0];
 					var y2 = circlePositions[order][1]+harmonicRadius*Math.cos(order*Math.PI*2/nodeCount);
 					return [[x2,y2],[x1,y1]];
 				}
-				
-				context.beginPath();
-				context.moveTo(circlePositions[0][0],circlePositions[0][1]);
-				context.lineJoin="round";
-				context.lineWidth = lineWidth;
-				context.strokeStyle = strokeStyle;
-				context.fillStyle = fillStyle;
-				context.globalAlpha = lineOpacity;
-				for (i=1;i<nodeCount;i++){
-					context.lineTo(circlePositions[i][0],circlePositions[i][1]);
-				}
-				context.closePath();
-				context.stroke();
-				context.globalAlpha = fillOpacity;
-				context.fill();
-				
-				if (bounce !== 0 && (Math.round(bounceStrength*1000)/1000 === 0)) {
-					bounce = bounce-1;
-					bounceStrength = Math.PI*4;
-				} else if (bounce === 0 && (Math.round(bounceStrength*1000)/1000 === 0)){
-					bounceStrength = Math.PI*4;
-				}
-			
-				var distance = Math.sqrt(Math.pow(coordinates[0]-origin[0]-offset[0],2)+Math.pow(coordinates[1]-origin[1]-offset[1],2));
-				var thresholdRadius = (Math.max.apply(null,blobRadii)+Math.min.apply(null,blobRadii))/2;
-				if (Math.round((thresholdRadius+attraction*thresholdRadius+lineWidth/2)/distance*10)/10 === 1 && bounceOn === 1) {
-					bounce = 1;
-					bounceStrength = Math.PI*4;
-				}
-				
 				((function (){var x = {0:function(){window.requestAnimationFrame(animate)},1:function(){}}; return x[isStatic]})())();
 			}
 			window.requestAnimationFrame(animate);
