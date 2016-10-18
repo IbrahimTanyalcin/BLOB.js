@@ -1,3 +1,4 @@
+Math.sign = Math.sign || function (x){return Math.abs(x)/x || 0;}
 var coordinates = [0,0];
 		var areaBlob = {};
 		var blobJsCanvasCounter = 0;
@@ -87,6 +88,15 @@ var coordinates = [0,0];
 					}
 				}
 				return r;
+			},
+			moveTo:function moveTo (ID,pos,t,delay) {
+				delay = delay===undefined?0:delay;
+				var element = document.getElementById(ID);
+				var X = pos[0]!==undefined?pos[0]:pos.x;
+				var Y = pos[1]!==undefined?pos[1]:pos.y;
+				element.style.transition = "top "+t+"s ease"+" "+delay+"s,"+"left "+t+"s ease"+" "+delay+"s";
+				element.style.top = Y+"px";
+				element.style.left = X+"px";
 			}
 		}
 		
@@ -107,7 +117,7 @@ var coordinates = [0,0];
 				document.body.appendChild(createdElement);
 			}
 			
-			document.getElementById(areaObject.id).style.position = "absolute";
+			document.getElementById(areaObject.id).style.position = areaObject.position || "absolute";
 			document.getElementById(areaObject.id).style.top = top;
 			document.getElementById(areaObject.id).style.left = left;
 			document.getElementById(areaObject.id).style.zIndex = zIndex;
@@ -139,8 +149,10 @@ var coordinates = [0,0];
 				ID = blobObject.id || ("myCanvas"+blobJsCanvasCounter);
 			}
 			blobJsCanvasCounter++;
-			var width = areaBlob.width;
-			var height = areaBlob.height;
+			var width = blobObject.width===undefined?areaBlob.width:blobObject.width;
+			var height = blobObject.height===undefined?areaBlob.height:blobObject.height;
+			//var top = blobObject.top===undefined?areaBlob.top:blobObject.top;
+			//var left = blobObject.left===undefined?areaBlob.left:blobObject.left;
 			var nodeCount = blobObject.nodeCount || 10;
 			var origin = blobObject.origin || [(areaBlob.width)/2,(areaBlob.height)/2];
 			var circlePositions = [];
@@ -194,8 +206,8 @@ var coordinates = [0,0];
 			} else {
 				document.body.appendChild(createdElement);
 				document.getElementById(ID).style.position = "absolute";
-				document.getElementById(ID).style.top = areaBlob.top;
-				document.getElementById(ID).style.left = areaBlob.left;
+				document.getElementById(ID).style.top = parentTop;
+				document.getElementById(ID).style.left = parentLeft;
 			}
 			
 			document.getElementById(ID).style.zIndex = areaBlob.zIndex - 1;
@@ -205,6 +217,12 @@ var coordinates = [0,0];
 			//append the canvas element
 			
 			function animate(timestamp) {
+				//console.log(ID);
+				if(blobObject.parent) {
+					if (!document.getElementById(blobObject.parent)) {
+						return;
+					}
+				}
 				var thetaMouse = Math.atan((origin[1]+offset[1]-coordinates[1])/(origin[0]+offset[0]-coordinates[0]));
 				context.globalAlpha = xray;
 				var bounceCoeff = 1;
@@ -321,7 +339,10 @@ var coordinates = [0,0];
 					var y2 = circlePositions[order][1]+harmonicRadius*Math.cos(order*Math.PI*2/nodeCount);
 					return [[x2,y2],[x1,y1]];
 				}
-				((function (){var x = {0:function(){window.requestAnimationFrame(animate)},1:function(){}}; return x[isStatic]})())();
+				//((function (){var x = {0:function(){window.spinnerId = window.requestAnimationFrame(animate)},1:function(){}}; return x[isStatic]})())();
+				window.requestAnimationFrame(animate);
+				//animate();
 			}
-			window.requestAnimationFrame(animate);
+			window.spinnerId = window.requestAnimationFrame(animate);
+			//animate();
 		};
