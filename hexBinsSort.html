@@ -1,0 +1,216 @@
+<!--Copyright Ibrahim Tanyalcin 2013-2015.-->
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1">
+        <title>Blob.js by Ibrahim Tanyalcin</title>
+        <script src="https://cdn.rawgit.com/IbrahimTanyalcin/BLOB.js/313feff3/blob1.0.4.7.js" type="text/javascript"></script>
+		 <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+		<script src="https://apis.google.com/js/platform.js" async defer></script>
+		<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+		<style type ="text/css">
+			@font-face{
+				font-family: "mystery";
+				src: url("./fonts/mystery.ttf");
+			}
+			@font-face{
+				font-family: "freckle";
+				src: url("./fonts/Asap-Regular.ttf");
+			}
+			html {
+				background:gray;
+				margin-left:auto;
+				margin-right:auto;
+			}
+			body {
+				padding-left:50px;
+				position:relative;
+				margin-left:auto;
+				margin-right:auto;
+				background: white;
+				width: 800px;
+				height:2000px;
+			}
+			#textDiv {
+				position:relative;
+				margin-left:auto;
+				margin-right:auto;
+				top:100px;
+				text-align: center;
+				font-family: "mystery";
+			}
+			#par{
+				position:relative;
+				margin-left:auto;
+				margin-right:auto;
+				top:50px;
+				width:700px;
+				text-align: left;
+				font-family: "freckle";
+				font-size: 16px;
+				opacity:0.8;
+				line-height: 60px;
+				padding-right:100px;
+			}
+			#par2,#par3,#par4,#par5,#par6,#par7,#par8,#par9{
+				position:relative;
+				margin-left:auto;
+				margin-right:auto;
+				//top:700px;
+				width:700px;
+				text-align: left;
+				font-family: "freckle";
+				font-size: 14px;
+				opacity:0.8;
+				line-height: 60px;
+				//overflow-y: scroll;
+				padding-right:100px;
+			}
+			#div1 {
+				position: absolute;
+				top:435px;
+				left:0px;
+			}
+			#drawHere {
+				overflow: hidden;
+			}
+			#button {
+				position: absolute;
+				top:400px;
+				left:400px;
+			}
+			#___plusone_0 {
+				position: absolute;
+				top: 350px;
+				left: 255px;
+				z-index: 100;
+			}
+			#twitterDiv{
+				position: absolute;
+				top: 350px;
+				left:330px;
+				z-index: 100;
+			}
+			.fb-share-button {
+				position: absolute;
+				top: 350px;
+				left: 370px;
+				z-index: 100;
+			}
+			#linkedinShare{
+				position: absolute;
+				top: 350px;
+				left: 540px;
+				z-index: 100;
+			}
+			#github {
+				position:absolute;
+				top: 350px;
+				left: 50px;
+				z-index: 100;
+			}
+		</style>
+		<!-- Start of Google Analytics Code for Default Guide -->
+		<script>
+		  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		  ga('create', 'UA-60672496-1', 'auto');
+		  ga('send', 'pageview');
+
+		</script>
+		<!-- End of Google Analytics Code for Default Guide -->
+		<script src="//platform.linkedin.com/in.js" type="text/javascript"> lang: en_US</script>
+    </head>
+    <body>
+	<div id="github"><a class="github-button" href="https://github.com/IbrahimTanyalcin" data-style="mega" data-count-href="/IbrahimTanyalcin/followers" data-count-api="/users/IbrahimTanyalcin#followers" data-count-aria-label="# followers on GitHub" aria-label="Follow @IbrahimTanyalcin on GitHub">Follow @Ibrahim</a></div>
+	<div id="linkedinShare"><script type="IN/Share" data-url="http://i-pv.org/blob.html" data-counter="right"></script></div>
+	<div id="fb-root"></div>
+	<script>(function(d, s, id) {
+	var js, fjs = d.getElementsByTagName(s)[0];
+	if (d.getElementById(id)) return;
+	js = d.createElement(s); js.id = id;
+	js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.5";
+	fjs.parentNode.insertBefore(js, fjs);
+	}(document, 'script', 'facebook-jssdk'));</script>
+	<div class="fb-share-button" data-href="http://i-pv.org/blob.html" data-layout="button_count"></div>
+	<div id="twitterDiv">
+	<a href="https://twitter.com/share" class="twitter-share-button" data-size="large" data-hashtags="Javascript">Tweet</a>
+	</div>
+	<div id="googlePlusOne" class="g-plusone"></div>
+		<div id="textDiv"><span style="font-size:40px;font-weight:900;color:darkslategray;opacity:0.7;">BLOB.js<span style="font-size:30px;font-weight:400;color:darkslategray;opacity:0.9;">v1.0.4.7</span></span><br><span style="font-size:30px;font-weight:normal;font-style:italic;color:slategray;opacity:0.9;">Drawing shapes and rendering scenes..</span>
+		<div id="par" style="height:739px;">
+		<span style="text-align:center;color:red;font-size:15px;display:block;line-height:15px;font-style:italic;opacity:0.65;width:300px;margin-left:auto;margin-right:auto;">Below are the quick links:</span>
+		<span style="background:orange;display:table;text-align:center;margin-left:auto;margin-right:auto;width:300px;border-radius:25px;transition:background 1s ease;line-height:30px;" onmouseover="this.childNodes[0].parentElement.style.backgroundColor = 'DeepPink';" onmouseout="this.childNodes[0].parentElement.style.backgroundColor = 'orange';"><a href="./blob.html" style="color:gray;font-family:helvetica;text-decoration:none;">INTRODUCTION</a></span>
+		<span style="background:orange;display:table;text-align:center;margin-left:auto;margin-right:auto;width:300px;border-radius:25px;transition:background 1s ease;line-height:30px;" onmouseover="this.childNodes[0].parentElement.style.backgroundColor = 'DeepPink';" onmouseout="this.childNodes[0].parentElement.style.backgroundColor = 'orange';"><a href="./blob2.html" style="color:gray;font-family:helvetica;text-decoration:none;">RENDERING SHAPES</a></span><br>
+		</div>
+		</div>
+		
+		
+		<button id="button" onclick="render()">redraw</button>
+		<div id="div1"></div>
+		<script type="text/javascript">
+		var data = {};
+		var stack = {};
+		var level = 20;
+		var step = 255/40;
+		var generator = d3.random.normal(127.5,50);
+		var timeout;
+		initiateBlobArea({id:"drawHere",width:850,height:800,top:0,left:0,parent:"div1"});
+		function del() {
+			var nodeListCanvas = document.querySelectorAll("canvas");
+			for (i=0;i<nodeListCanvas.length;i++){
+				nodeListCanvas[i].remove();
+			}
+		}
+		function render() {
+			del();
+			initiateStack();
+			clearTimeout(timeout);
+			for (var k=0;k<20;k++) {
+				for (var j=0;j<40;j++){
+					generateBin(k,j,6);
+				}
+			}
+			
+			function generateBin (k,j,r) {
+				//var rnd = Math.round(Math.random()*765/3);
+				var rnd = Math.round(Math.min(Math.max(0,generator()),255));
+				var color = "rgba("+rnd+","+rnd+","+rnd+",1)";
+				blob({width:2*r,height:3*r,top:0+k*3/2*r,left:220+j*r*Math.sqrt(3)+(k%2)*r/2*Math.sqrt(3),nodeCount:6,origin:[r,3/2*r],blobRadius:r,lineWidth:1,strokeStyle:"Black",fillStyle:color,randomness:0,fillOpacity:0.5,lineOpacity:0.8,minPeriod:3,maxPeriod:3,id:"myCanvas"+k+","+j,harmonicRadius:r*0.1,attraction:0.0001,bounce:1,xray:0,parent:"drawHere",tick:0,tickLine:0,isStatic:1});
+				data["myCanvas"+k+","+j] = rnd;
+			}
+			
+			timeout = setTimeout(function(){
+				for (var k=level;k>=1;k--) {
+					sort(k,6);
+				}
+			},3000);
+		}
+		
+		render();
+		
+		function initiateStack() {
+			for (var i = 0;i<41;i++) {
+				stack[i] = 0;
+			}
+		}
+		function sort(level,r) {
+				for (var j = 0;j<40;j++) {
+					var rnd = data["myCanvas"+(level-1)+","+j];
+					var stackKey = Math.round(rnd/step);
+					var stackH = 220+(40-Math.round(rnd/step))*Math.sqrt(3)*r;
+					//console.log(48-Math.round(rnd/step));
+					var stackV = 190+2*r*(stack[stackKey]+19);
+					blobTools.moveTo("myCanvas"+(level-1)+","+j,[stackH,stackV],3,0);
+					stack[stackKey]--;
+				}
+		}
+			
+		</script>
+		<script async defer id="github-bjs" src="https://buttons.github.io/buttons.js"></script>
+    </body>
+</html> 
+<!--Copyright Ibrahim Tanyalcin 2013-2015.-->
